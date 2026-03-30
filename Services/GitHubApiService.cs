@@ -59,7 +59,7 @@ namespace GitVault.Services
                             repos.Add(new RepositoryInfo
                             {
                                 Name = repo.Name,
-                                CloneUrl = repo.CloneUrl,
+                                CloneUrl = GetAuthenticatedCloneUrl(repo.CloneUrl),
                                 Owner = org,
                                 DefaultBranch = repo.DefaultBranch,
                                 LastPush = repo.PushedAt?.UtcDateTime ?? DateTime.MinValue
@@ -97,7 +97,7 @@ namespace GitVault.Services
                             repos.Add(new RepositoryInfo
                             {
                                 Name = repo.Name,
-                                CloneUrl = repo.CloneUrl,
+                                CloneUrl = GetAuthenticatedCloneUrl(repo.CloneUrl),
                                 Owner = user,
                                 DefaultBranch = repo.DefaultBranch,
                                 LastPush = repo.PushedAt?.UtcDateTime ?? DateTime.MinValue
@@ -119,6 +119,14 @@ namespace GitVault.Services
 
             LogHelpers.Info($"Toplam {repos.Count} repo bulundu (ignore harici)", LogCategory.GitHub, SRC);
             return repos;
+        }
+
+        private string GetAuthenticatedCloneUrl(string cloneUrl)
+        {
+            if (string.IsNullOrEmpty(AppSettings.GitHubToken) || !cloneUrl.StartsWith("https://"))
+                return cloneUrl;
+
+            return cloneUrl.Replace("https://", $"https://{AppSettings.GitHubToken}@");
         }
 
         private bool IsIgnored(string repoName)

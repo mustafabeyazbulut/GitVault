@@ -40,7 +40,29 @@ namespace GitVault
         {
             LogHelpers.Info("Service durduruluyor...", LogCategory.Service, SRC);
             _cts?.Cancel();
+            KillGitProcesses();
             LogHelpers.Flush();
+        }
+
+        private void KillGitProcesses()
+        {
+            try
+            {
+                foreach (var proc in System.Diagnostics.Process.GetProcessesByName("git"))
+                {
+                    try
+                    {
+                        proc.Kill();
+                        LogHelpers.Debug($"Git process sonlandirildi (PID: {proc.Id})", LogCategory.Service, SRC);
+                    }
+                    catch { }
+                    finally { proc.Dispose(); }
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelpers.Warn($"Git processleri sonlandirilamadi: {ex.Message}", LogCategory.Service, SRC);
+            }
         }
 
         public void OnDebug()

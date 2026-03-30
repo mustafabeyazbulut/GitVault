@@ -53,10 +53,15 @@ namespace GitVault.Services
             }, maxRetries: 3, delaySeconds: 5, operationName: $"Klasor olusturma: {repo.Owner}/{repo.Name}");
 
             string currentCommit;
+            var cacheBaseDir = gitCacheDir;
 
-            if (Directory.Exists(gitCacheDir) && Directory.Exists(Path.Combine(gitCacheDir, ".git")))
+            // Gecerli bir cache bul
+            gitCacheDir = FindValidCache(cacheBaseDir);
+
+            if (gitCacheDir != null)
             {
-                LogHelpers.Info($"Repo guncelleniyor: {repo.Owner}/{repo.Name}", LogCategory.Git, SRC);
+                // Mevcut gecerli cache var, fetch ile guncelle
+                LogHelpers.Info($"Repo guncelleniyor: {repo.Owner}/{repo.Name} (cache: {Path.GetFileName(gitCacheDir)})", LogCategory.Git, SRC);
 
                 var fetchResult = await RetryHelper.ExecuteAsync(async () =>
                 {
@@ -77,19 +82,17 @@ namespace GitVault.Services
             }
             else
             {
-                if (Directory.Exists(gitCacheDir))
-                    Directory.Delete(gitCacheDir, true);
+                // Gecerli cache yok, yeni tarihli klasore clone yap
+                gitCacheDir = cacheBaseDir + "_" + DateTime.Now.ToString("yyyyMMdd_HHmmss");
 
-                LogHelpers.Info($"Repo klonlaniyor: {repo.Owner}/{repo.Name}", LogCategory.Git, SRC);
+                LogHelpers.Info($"Repo klonlaniyor: {repo.Owner}/{repo.Name} -> {Path.GetFileName(gitCacheDir)}", LogCategory.Git, SRC);
 
                 await RetryHelper.ExecuteAsync(async () =>
                 {
                     var result = await RunGitAsync($"clone \"{repo.CloneUrl}\" \"{gitCacheDir}\"", null);
                     if (!result.Success)
                     {
-                        // Basarisiz clone sonrasi temizle, tekrar denenecek
-                        if (Directory.Exists(gitCacheDir))
-                            Directory.Delete(gitCacheDir, true);
+                        try { if (Directory.Exists(gitCacheDir)) Directory.Delete(gitCacheDir, true); } catch { }
                         throw new Exception($"Git clone hatasi: {result.Error}");
                     }
                     return result;
@@ -97,6 +100,9 @@ namespace GitVault.Services
 
                 var commitResult = await RunGitAsync("rev-parse HEAD", gitCacheDir);
                 currentCommit = commitResult.Output.Trim();
+
+                // Eski bozuk cache klasorlerini temizlemeye calis
+                CleanOldCaches(cacheBaseDir, gitCacheDir);
             }
 
             // Son kaydedilen commit ile karsilastir
@@ -281,7 +287,7 @@ namespace GitVault.Services
             var psi = new ProcessStartInfo
             {
                 FileName = "git",
-                Arguments = arguments,
+                Arguments = $"-c safe.directory=* {arguments}",
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 StandardOutputEncoding = Encoding.UTF8,
@@ -292,9 +298,7 @@ namespace GitVault.Services
 
             psi.EnvironmentVariables["LANG"] = "en_US.UTF-8";
             psi.EnvironmentVariables["LC_ALL"] = "en_US.UTF-8";
-            psi.EnvironmentVariables["GIT_CONFIG_COUNT"] = "1";
-            psi.EnvironmentVariables["GIT_CONFIG_KEY_0"] = "safe.directory";
-            psi.EnvironmentVariables["GIT_CONFIG_VALUE_0"] = "*";
+            psi.EnvironmentVariables["GIT_TERMINAL_PROMPT"] = "0";
 
             if (!string.IsNullOrEmpty(workingDirectory))
                 psi.WorkingDirectory = workingDirectory;
@@ -303,7 +307,16 @@ namespace GitVault.Services
             {
                 var output = await process.StandardOutput.ReadToEndAsync();
                 var error = await process.StandardError.ReadToEndAsync();
-                process.WaitForExit();
+
+                if (!process.WaitForExit(120000)) // 2 dakika timeout
+                {
+                    try { process.Kill(); } catch { }
+                    return new GitResult
+                    {
+                        Success = false,
+                        Error = $"Git islemi zaman asimina ugradi (2 dk): git {arguments}"
+                    };
+                }
 
                 return new GitResult
                 {
@@ -389,6 +402,72 @@ namespace GitVault.Services
         }
 
         #endregion
+
+        /// <summary>
+        /// Gecerli bir git cache klasoru bulur. Onceligi: ana klasor, sonra tarihli alternatifler (en yeni once).
+        /// Hicbiri gecerli degilse null doner.
+        /// </summary>
+        private string FindValidCache(string baseCacheDir)
+        {
+            // Ana klasor gecerli mi?
+            if (IsValidGitCache(baseCacheDir))
+                return baseCacheDir;
+
+            // Tarihli alternatiflere bak (en yenisi once)
+            var parentDir = Path.GetDirectoryName(baseCacheDir);
+            var dirName = Path.GetFileName(baseCacheDir);
+
+            if (parentDir != null && Directory.Exists(parentDir))
+            {
+                var found = Directory.GetDirectories(parentDir, dirName + "_*")
+                    .Where(IsValidGitCache)
+                    .OrderByDescending(d => d)
+                    .FirstOrDefault();
+
+                if (found != null)
+                {
+                    LogHelpers.Info($"Gecerli cache bulundu: {Path.GetFileName(found)}", LogCategory.Git, SRC);
+                    return found;
+                }
+            }
+
+            return null;
+        }
+
+        private bool IsValidGitCache(string dir)
+        {
+            return Directory.Exists(dir)
+                && Directory.Exists(Path.Combine(dir, ".git"))
+                && File.Exists(Path.Combine(dir, ".git", "HEAD"));
+        }
+
+        /// <summary>
+        /// Bozuk/eski cache klasorlerini temizlemeye calisir. Silemezse sessizce gecer.
+        /// </summary>
+        private void CleanOldCaches(string baseCacheDir, string currentCacheDir)
+        {
+            var parentDir = Path.GetDirectoryName(baseCacheDir);
+            var dirName = Path.GetFileName(baseCacheDir);
+            if (parentDir == null || !Directory.Exists(parentDir)) return;
+
+            // Ana klasor + tarihli klasorleri bul, aktif olani haric tut
+            var allCaches = Directory.GetDirectories(parentDir, dirName + "*")
+                .Where(d => !string.Equals(d, currentCacheDir, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            foreach (var dir in allCaches)
+            {
+                try
+                {
+                    Directory.Delete(dir, true);
+                    LogHelpers.Info($"Eski cache silindi: {Path.GetFileName(dir)}", LogCategory.Git, SRC);
+                }
+                catch
+                {
+                    LogHelpers.Debug($"Eski cache silinemedi (sonra tekrar denenecek): {Path.GetFileName(dir)}", LogCategory.Git, SRC);
+                }
+            }
+        }
 
         private static string SafeSubstring(string value, int length)
         {

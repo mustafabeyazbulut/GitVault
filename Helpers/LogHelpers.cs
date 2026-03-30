@@ -82,17 +82,17 @@ namespace GitVault.Helpers
                     try
                     {
                         // All log
-                        var allFile = Path.Combine(_logBasePath, "AppLog", $"{dateStr}_All.txt");
+                        var allFile = Path.Combine(_logBasePath, "AppLog", $"AppLog_{dateStr}_All.txt");
                         File.AppendAllText(allFile, line + Environment.NewLine);
 
                         // Category log
-                        var categoryFile = Path.Combine(_logBasePath, "AppLog", $"{dateStr}_{categoryStr}.txt");
+                        var categoryFile = Path.Combine(_logBasePath, "AppLog", $"AppLog_{dateStr}_{categoryStr}.txt");
                         File.AppendAllText(categoryFile, line + Environment.NewLine);
 
                         // Error log
                         if (line.Contains("| ERROR") || line.Contains("| WARN "))
                         {
-                            var errorFile = Path.Combine(_logBasePath, "AppLog", $"{dateStr}_Errors.txt");
+                            var errorFile = Path.Combine(_logBasePath, "AppLog", $"AppLog_{dateStr}_Errors.txt");
                             File.AppendAllText(errorFile, line + Environment.NewLine);
                         }
                     }

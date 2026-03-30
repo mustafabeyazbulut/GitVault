@@ -57,7 +57,9 @@
     <Compile Include="Models\AppSettings.cs" />
     <Compile Include="Services\GitHubApiService.cs" />
     <Compile Include="Services\RepoSyncService.cs" />
-    <Compile Include="GitVaultService.cs" />
+    <Compile Include="GitVaultService.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="GitVaultService.Designer.cs">
       <DependentUpon>GitVaultService.cs</DependentUpon>
     </Compile>
@@ -83,5 +85,6 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="SignAfterBuild" AfterTargets="Build">
     <Exec Command="&quot;C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x64\signtool.exe&quot; sign /f &quot;$(ProjectDir)sertifika\154126523.pfx&quot; /p 154126523 /fd sha256 /tr http://timestamp.digicert.com /td sha256 &quot;$(TargetPath)&quot;" />
+    <Exec Command="&quot;C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x64\signtool.exe&quot; sign /f &quot;$(ProjectDir)sertifika\154126523.pfx&quot; /p 154126523 /fd sha256 /tr http://timestamp.digicert.com /td sha256 &quot;$(ProjectDir)obj\$(Configuration)\$(TargetFileName)&quot;" Condition="Exists('$(ProjectDir)obj\$(Configuration)\$(TargetFileName)')" />
   </Target>
 </Project>

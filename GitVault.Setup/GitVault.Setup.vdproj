@@ -21,32 +21,32 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_5083AC6EB8754452AD885BE5C6931156"
+        "MsmKey" = "8:_6651FE1107B749D88FB79F84AF7A210A"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_803457A92B5E4168EFA083C921D987D9"
-        "OwnerKey" = "8:_5083AC6EB8754452AD885BE5C6931156"
+        "OwnerKey" = "8:_6651FE1107B749D88FB79F84AF7A210A"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_870B378F8139AA05667DE7FCE039E9B0"
-        "OwnerKey" = "8:_5083AC6EB8754452AD885BE5C6931156"
+        "OwnerKey" = "8:_6651FE1107B749D88FB79F84AF7A210A"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_A184ACC1466BD90F89D0443C4BA20A94"
-        "OwnerKey" = "8:_5083AC6EB8754452AD885BE5C6931156"
+        "OwnerKey" = "8:_6651FE1107B749D88FB79F84AF7A210A"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_A9EDDDDE37829AF4ABC2D4456E7C6D37"
-        "OwnerKey" = "8:_5083AC6EB8754452AD885BE5C6931156"
+        "OwnerKey" = "8:_6651FE1107B749D88FB79F84AF7A210A"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -64,7 +64,7 @@
         "Entry"
         {
         "MsmKey" = "8:_AB5C520A16A3B4C63AC0529B98825606"
-        "OwnerKey" = "8:_5083AC6EB8754452AD885BE5C6931156"
+        "OwnerKey" = "8:_6651FE1107B749D88FB79F84AF7A210A"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -88,7 +88,7 @@
         "Entry"
         {
         "MsmKey" = "8:_E3AC1DBCFC3ECF3A25B5B3CA986194F9"
-        "OwnerKey" = "8:_5083AC6EB8754452AD885BE5C6931156"
+        "OwnerKey" = "8:_6651FE1107B749D88FB79F84AF7A210A"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -100,7 +100,7 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_5083AC6EB8754452AD885BE5C6931156"
+        "OwnerKey" = "8:_6651FE1107B749D88FB79F84AF7A210A"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -170,6 +170,14 @@
             "PrerequisitesLocation" = "2:1"
             "Url" = "8:"
             "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.7.2"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4.7.2 (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.7.2"
+                    }
+                }
             }
         }
         "Release"
@@ -194,6 +202,14 @@
             "PrerequisitesLocation" = "2:1"
             "Url" = "8:"
             "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.7.2"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4.7.2 (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.7.2"
+                    }
+                }
             }
         }
     }
@@ -201,31 +217,31 @@
     {
         "CustomAction"
         {
-            "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_130B820171044CF8A5D2F844CE625629"
+            "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_0A6CE5F4784C4CED9ED7C8F409E13232"
             {
             "Name" = "8:Primary output from GitVault (Release Any CPU)"
             "Condition" = "8:"
-            "Object" = "8:_5083AC6EB8754452AD885BE5C6931156"
-            "FileType" = "3:2"
-            "InstallAction" = "3:4"
-            "Arguments" = "8:"
-            "EntryPoint" = "8:"
-            "Sequence" = "3:1"
-            "Identifier" = "8:_196E593E_A4C0_42C0_BE7B_FD7A0BEE06F5"
-            "InstallerClass" = "11:TRUE"
-            "CustomActionData" = "8:"
-            }
-            "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_422A382F14A448DD8E4EA26E5EF8428E"
-            {
-            "Name" = "8:Primary output from GitVault (Release Any CPU)"
-            "Condition" = "8:"
-            "Object" = "8:_5083AC6EB8754452AD885BE5C6931156"
+            "Object" = "8:_6651FE1107B749D88FB79F84AF7A210A"
             "FileType" = "3:2"
             "InstallAction" = "3:1"
             "Arguments" = "8:"
             "EntryPoint" = "8:"
             "Sequence" = "3:1"
-            "Identifier" = "8:_C10E178C_18E2_4C02_B380_6EB238D5B5D5"
+            "Identifier" = "8:_A3041D6D_B81B_49ED_9B59_DD22575C1805"
+            "InstallerClass" = "11:TRUE"
+            "CustomActionData" = "8:"
+            }
+            "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_684A194509A54AE480011804A56DCCB0"
+            {
+            "Name" = "8:Primary output from GitVault (Release Any CPU)"
+            "Condition" = "8:"
+            "Object" = "8:_6651FE1107B749D88FB79F84AF7A210A"
+            "FileType" = "3:2"
+            "InstallAction" = "3:4"
+            "Arguments" = "8:"
+            "EntryPoint" = "8:"
+            "Sequence" = "3:1"
+            "Identifier" = "8:_090FFA6F_8D53_4CE0_A43D_19D71BC97427"
             "InstallerClass" = "11:TRUE"
             "CustomActionData" = "8:"
             }
@@ -588,7 +604,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:GitVault"
         "ProductCode" = "8:{9490C2E4-83A1-4965-9588-D3D7D1FF65F0}"
-        "PackageCode" = "8:{7977124A-4F81-439F-952D-87515DF3B192}"
+        "PackageCode" = "8:{CB2EB53B-BE3B-4679-883C-6065C8A6C7F3}"
         "UpgradeCode" = "8:{99E6333A-787B-426A-8997-445BCAC6C690}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -1107,9 +1123,9 @@
         }
         "ProjectOutput"
         {
-            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_5083AC6EB8754452AD885BE5C6931156"
+            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_6651FE1107B749D88FB79F84AF7A210A"
             {
-            "SourcePath" = "8:..\\obj\\Release\\GitVault.exe"
+            "SourcePath" = "8:..\\obj\\Debug\\GitVault.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_580D87AE91464A839714D7E0A79CAC61"

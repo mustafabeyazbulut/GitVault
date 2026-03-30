@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using System.IO;
 using System.Runtime.InteropServices;
 using GitVault.Models;
 
@@ -51,19 +52,23 @@ namespace GitVault.Helpers
         /// </summary>
         public static bool EnsureConnected()
         {
+            // Once mevcut erisimi kontrol et
+            if (CanAccessDestination())
+            {
+                LogHelpers.Debug("NAS paylasimina mevcut oturumla erisilebiliyor, ek baglanti gerekmiyor", LogCategory.Sync, SRC);
+                return true;
+            }
+
             var username = AppSettings.NasUsername;
             var password = AppSettings.NasPassword;
 
             if (string.IsNullOrWhiteSpace(username))
             {
-                LogHelpers.Debug("NAS kimlik bilgileri tanimi yok, mevcut oturum yetkileri kullanilacak", LogCategory.Sync, SRC);
-                return true;
+                LogHelpers.Warn("NAS erisimi yok ve kimlik bilgileri tanimlanmamis", LogCategory.Sync, SRC);
+                return false;
             }
 
             var shareRoot = GetShareRoot(AppSettings.DestinationPath);
-
-            // Onceki baglanti varsa kaldir (kimlik bilgileri degismis olabilir)
-            WNetCancelConnection2(shareRoot, 0, true);
 
             var netResource = new NETRESOURCE
             {
@@ -81,9 +86,32 @@ namespace GitVault.Helpers
                 return true;
             }
 
+            // 1219: Zaten baska bir oturumla bagli - erisim varsa sorun yok
+            if (result == 1219)
+            {
+                LogHelpers.Debug("NAS paylasimina zaten farkli bir oturumla bagli, mevcut baglanti kullanilacak", LogCategory.Sync, SRC);
+                return true;
+            }
+
             var errorMessage = new Win32Exception(result).Message;
             LogHelpers.Error($"NAS paylasimina baglanilamadi (hata kodu: {result}): {errorMessage}", LogCategory.Sync, SRC);
             return false;
+        }
+
+        private static bool CanAccessDestination()
+        {
+            try
+            {
+                Directory.Exists(AppSettings.DestinationPath);
+                var testPath = Path.Combine(AppSettings.DestinationPath, ".gitvault-net-test");
+                File.WriteAllText(testPath, "test");
+                File.Delete(testPath);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         /// <summary>
