@@ -16,6 +16,10 @@ namespace GitVault.Models
 
         public static List<string> IgnoreRepos => ParseList(ConfigurationManager.AppSettings["GitHub:IgnoreRepos"]);
 
+        // NAS Kimlik Bilgileri
+        public static string NasUsername => ConfigurationManager.AppSettings["Nas:Username"] ?? "";
+        public static string NasPassword => ConfigurationManager.AppSettings["Nas:Password"] ?? "";
+
         // Senkronizasyon Ayarlari
         public static string DestinationPath => ConfigurationManager.AppSettings["Sync:DestinationPath"] ?? @"\\atsb-nas\Yazilim";
 

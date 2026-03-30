@@ -7,6 +7,10 @@
     <add key="GitHub:Users" value="KullaniciAdi1,KullaniciAdi2" />
     <add key="GitHub:IgnoreRepos" value="yedeklenmeyecek-repo1,yedeklenmeyecek-repo2" />
 
+    <!-- NAS Kimlik Bilgileri (opsiyonel - bos birakilirsa mevcut oturum yetkileri kullanilir) -->
+    <add key="Nas:Username" value="DOMAIN\kullaniciadi" />
+    <add key="Nas:Password" value="sifre" />
+
     <!-- Senkronizasyon Ayarlari -->
     <add key="Sync:DestinationPath" value="\\sunucu\paylasim\yedek" />
     <add key="Sync:CheckIntervalMinutes" value="30" />

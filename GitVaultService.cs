@@ -76,6 +76,13 @@ namespace GitVault
             {
                 LogHelpers.Info("=== Senkronizasyon basladi ===", LogCategory.Service, SRC);
 
+                // NAS baglantisi kur (kimlik bilgileri tanimliysa)
+                if (!NetworkShareHelper.EnsureConnected())
+                {
+                    LogHelpers.Error($"NAS paylasimina baglanilamadi: {AppSettings.DestinationPath}. Bu dongu atlanacak.", LogCategory.Service, SRC);
+                    return;
+                }
+
                 // NAS erisim kontrolu
                 if (!_syncService.CheckDestinationAccess())
                 {

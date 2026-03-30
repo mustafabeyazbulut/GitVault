@@ -292,6 +292,9 @@ namespace GitVault.Services
 
             psi.EnvironmentVariables["LANG"] = "en_US.UTF-8";
             psi.EnvironmentVariables["LC_ALL"] = "en_US.UTF-8";
+            psi.EnvironmentVariables["GIT_CONFIG_COUNT"] = "1";
+            psi.EnvironmentVariables["GIT_CONFIG_KEY_0"] = "safe.directory";
+            psi.EnvironmentVariables["GIT_CONFIG_VALUE_0"] = "*";
 
             if (!string.IsNullOrEmpty(workingDirectory))
                 psi.WorkingDirectory = workingDirectory;

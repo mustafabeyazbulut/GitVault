@@ -52,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Helpers\LogHelpers.cs" />
+    <Compile Include="Helpers\NetworkShareHelper.cs" />
     <Compile Include="Helpers\RetryHelper.cs" />
     <Compile Include="Models\AppSettings.cs" />
     <Compile Include="Services\GitHubApiService.cs" />
