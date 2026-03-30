@@ -136,6 +136,8 @@ temp/
 # =====================
 # Installer / Setup
 # =====================
+GitVault.Setup/Debug/
+GitVault.Setup/Release/
 *.msi
 *.msm
 *.cab
