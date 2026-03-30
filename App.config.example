@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<configuration>
+  <appSettings>
+    <!-- GitHub Ayarlari -->
+    <add key="GitHub:Token" value="ghp_XXXXXXXXXXXXXXXXXXXXXXXXXXXXX" />
+    <add key="GitHub:Organizations" value="OrgAdi1,OrgAdi2" />
+    <add key="GitHub:Users" value="KullaniciAdi1,KullaniciAdi2" />
+    <add key="GitHub:IgnoreRepos" value="yedeklenmeyecek-repo1,yedeklenmeyecek-repo2" />
+
+    <!-- Senkronizasyon Ayarlari -->
+    <add key="Sync:DestinationPath" value="\\sunucu\paylasim\yedek" />
+    <add key="Sync:CheckIntervalMinutes" value="30" />
+    <add key="Sync:MaxVersionsToKeep" value="5" />
+  </appSettings>
+</configuration>
