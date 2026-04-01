@@ -55,6 +55,7 @@
     <Compile Include="Helpers\NetworkShareHelper.cs" />
     <Compile Include="Helpers\RetryHelper.cs" />
     <Compile Include="Models\AppSettings.cs" />
+    <Compile Include="Services\EmailService.cs" />
     <Compile Include="Services\GitHubApiService.cs" />
     <Compile Include="Services\RepoSyncService.cs" />
     <Compile Include="GitVaultService.cs">

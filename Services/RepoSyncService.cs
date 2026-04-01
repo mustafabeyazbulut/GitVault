@@ -39,7 +39,8 @@ namespace GitVault.Services
             }
         }
 
-        public async Task SyncRepositoryAsync(RepositoryInfo repo)
+        // Donus degeri: true = repo guncellendi, false = degisiklik yoktu
+        public async Task<bool> SyncRepositoryAsync(RepositoryInfo repo)
         {
             var ownerDir = Path.Combine(AppSettings.DestinationPath, repo.Owner);
             var repoDir = Path.Combine(ownerDir, repo.Name);
@@ -74,7 +75,7 @@ namespace GitVault.Services
                 if (!resetResult.Success)
                 {
                     LogHelpers.Error($"Git reset basarisiz: {repo.Owner}/{repo.Name} - {resetResult.Error}", LogCategory.Git, SRC);
-                    return;
+                    return false;
                 }
 
                 var commitResult = await RunGitAsync("rev-parse HEAD", gitCacheDir);
@@ -110,7 +111,7 @@ namespace GitVault.Services
             if (string.Equals(currentCommit, lastCommit, StringComparison.OrdinalIgnoreCase))
             {
                 LogHelpers.Info($"Degisiklik yok: {repo.Owner}/{repo.Name} (commit: {SafeSubstring(currentCommit, 7)})", LogCategory.Sync, SRC);
-                return;
+                return false;
             }
 
             var shortCommit = SafeSubstring(currentCommit, 7);
@@ -165,6 +166,7 @@ namespace GitVault.Services
             CleanOldArchives(arsivDir);
 
             LogHelpers.Info($"Senkronizasyon tamamlandi: {repo.Owner}/{repo.Name} (commit: {shortCommit})", LogCategory.Sync, SRC);
+            return true;
         }
 
         private async Task GenerateChangelogAsync(RepositoryInfo repo, string gitCacheDir, string repoDir, string lastCommit, string currentCommit)

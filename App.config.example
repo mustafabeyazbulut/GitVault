@@ -15,5 +15,13 @@
     <add key="Sync:DestinationPath" value="\\sunucu\paylasim\yedek" />
     <add key="Sync:CheckIntervalMinutes" value="30" />
     <add key="Sync:MaxVersionsToKeep" value="5" />
+
+    <!-- Email Bildirimi (opsiyonel - bos birakilirsa mail atilmaz) -->
+    <add key="Email:To"           value="alici@sirket.com" />
+    <add key="Email:SmtpHost"     value="smtp.office365.com" />
+    <add key="Email:SmtpPort"     value="587" />
+    <add key="Email:SmtpUser"     value="gonderen@sirket.com" />
+    <add key="Email:SmtpPassword" value="sifre" />
+    <add key="Email:SmtpSsl"      value="true" />
   </appSettings>
 </configuration>

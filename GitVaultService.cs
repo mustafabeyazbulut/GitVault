@@ -2,6 +2,7 @@ using System;
 using System.ServiceProcess;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using GitVault.Helpers;
 using GitVault.Models;
 using GitVault.Services;
@@ -122,24 +123,30 @@ namespace GitVault
                         return;
                     }
 
-                    var successCount = 0;
-                    var errorCount = 0;
+                    var updatedRepos  = new List<string>();
+                    var noChangeRepos = new List<string>();
+                    var errorRepos    = new List<string>();
 
                     foreach (var repo in repos)
                     {
                         try
                         {
-                            await _syncService.SyncRepositoryAsync(repo);
-                            successCount++;
+                            var updated = await _syncService.SyncRepositoryAsync(repo);
+                            if (updated)
+                                updatedRepos.Add($"{repo.Owner}/{repo.Name}");
+                            else
+                                noChangeRepos.Add($"{repo.Owner}/{repo.Name}");
                         }
                         catch (Exception ex)
                         {
-                            errorCount++;
+                            errorRepos.Add($"{repo.Owner}/{repo.Name}");
                             LogHelpers.Error($"Repo senkronizasyonu basarisiz: {repo.Owner}/{repo.Name}", ex, LogCategory.Service, SRC);
                         }
                     }
 
-                    LogHelpers.Info($"=== Senkronizasyon tamamlandi === Basarili: {successCount}, Hatali: {errorCount}, Toplam: {repos.Count}", LogCategory.Service, SRC);
+                    LogHelpers.Info($"=== Senkronizasyon tamamlandi === Guncellenen: {updatedRepos.Count}, Degismeyen: {noChangeRepos.Count}, Hatali: {errorRepos.Count}, Toplam: {repos.Count}", LogCategory.Service, SRC);
+
+                    EmailService.SendSyncReport(updatedRepos, noChangeRepos, errorRepos);
                 }
             }
             catch (Exception ex)

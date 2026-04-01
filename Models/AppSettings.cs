@@ -41,6 +41,28 @@ namespace GitVault.Models
             }
         }
 
+        // Email Ayarlari
+        public static string EmailTo         => ConfigurationManager.AppSettings["Email:To"] ?? "";
+        public static string EmailSmtpHost   => ConfigurationManager.AppSettings["Email:SmtpHost"]   ?? "";
+        public static int    EmailSmtpPort
+        {
+            get
+            {
+                var val = ConfigurationManager.AppSettings["Email:SmtpPort"];
+                return int.TryParse(val, out var result) ? result : 587;
+            }
+        }
+        public static string EmailSmtpUser     => ConfigurationManager.AppSettings["Email:SmtpUser"]     ?? "";
+        public static string EmailSmtpPassword => ConfigurationManager.AppSettings["Email:SmtpPassword"] ?? "";
+        public static bool   EmailSmtpSsl
+        {
+            get
+            {
+                var val = ConfigurationManager.AppSettings["Email:SmtpSsl"];
+                return val == null || bool.TryParse(val, out var result) && result;
+            }
+        }
+
         private static List<string> ParseList(string value)
         {
             if (string.IsNullOrWhiteSpace(value))
