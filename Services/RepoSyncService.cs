@@ -289,7 +289,7 @@ namespace GitVault.Services
             var psi = new ProcessStartInfo
             {
                 FileName = "git",
-                Arguments = $"-c safe.directory=* {arguments}",
+                Arguments = $"-c safe.directory=* -c core.longpaths=true {arguments}",
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 StandardOutputEncoding = Encoding.UTF8,
@@ -335,23 +335,47 @@ namespace GitVault.Services
 
         private async Task CopyDirectoryAsync(string source, string destination)
         {
-            Directory.CreateDirectory(destination);
+            // Robocopy: uzun yol destegi (260 sinirini asar), NAS icin retry/wait, MT ile hizli kopya.
+            // /E       : tum alt klasorler (bos dahil)
+            // /XD .git : .git klasorunu hariç tut
+            // /COPY:DAT: Data + Attributes + Timestamps
+            // /R:3 /W:5: 3 deneme, 5sn bekle (NAS kesintileri icin)
+            // /NFL /NDL /NJH /NJS /NP : loglari sade tut
+            // /MT:8    : 8 thread ile paralel kopya
+            var args = $"\"{source.TrimEnd('\\')}\" \"{destination.TrimEnd('\\')}\" /E /XD \".git\" /COPY:DAT /R:3 /W:5 /NFL /NDL /NJH /NJS /NP /MT:8";
 
-            foreach (var file in Directory.GetFiles(source))
+            var psi = new ProcessStartInfo
             {
-                var destFile = Path.Combine(destination, Path.GetFileName(file));
-                using (var sourceStream = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, true))
-                using (var destStream = new FileStream(destFile, FileMode.Create, FileAccess.Write, FileShare.None, 4096, true))
+                FileName = "robocopy",
+                Arguments = args,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                StandardOutputEncoding = Encoding.UTF8,
+                StandardErrorEncoding = Encoding.UTF8,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            using (var process = Process.Start(psi))
+            {
+                var output = await process.StandardOutput.ReadToEndAsync();
+                var error = await process.StandardError.ReadToEndAsync();
+
+                if (!process.WaitForExit(1800000)) // 30 dakika timeout
                 {
-                    await sourceStream.CopyToAsync(destStream);
+                    try { process.Kill(); } catch { }
+                    throw new Exception($"Robocopy zaman asimina ugradi (30 dk): {source} -> {destination}");
                 }
-            }
 
-            foreach (var dir in Directory.GetDirectories(source))
-            {
-                var dirName = Path.GetFileName(dir);
-                if (dirName == ".git") continue;
-                await CopyDirectoryAsync(dir, Path.Combine(destination, dirName));
+                // Robocopy exit kodlari: 0-7 basarili (0=degisiklik yok, 1=kopyalandi, 2=fazla dosya, 3=1+2, ...)
+                // 8 ve uzeri = hata
+                if (process.ExitCode >= 8)
+                {
+                    throw new Exception(
+                        $"Robocopy hatasi (exit {process.ExitCode}): {source} -> {destination}" +
+                        (string.IsNullOrWhiteSpace(error) ? "" : $"\n{error}") +
+                        (string.IsNullOrWhiteSpace(output) ? "" : $"\n{output}"));
+                }
             }
         }
 
