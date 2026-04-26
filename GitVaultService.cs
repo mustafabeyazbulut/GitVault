@@ -13,13 +13,11 @@ namespace GitVault
     {
         private const string SRC = "GitVaultService";
         private CancellationTokenSource _cts;
-        private readonly GitHubApiService _gitHubApiService;
         private readonly RepoSyncService _syncService;
 
         public GitVaultService()
         {
             InitializeComponent();
-            _gitHubApiService = new GitHubApiService();
             _syncService = new RepoSyncService();
             LogHelpers.Info("Service olusturuldu", LogCategory.Service, SRC);
         }
@@ -115,7 +113,10 @@ namespace GitVault
 
                 using (LogHelpers.MeasureTime("Toplam senkronizasyon", LogCategory.Service, SRC))
                 {
-                    var repos = await _gitHubApiService.GetAllRepositoriesAsync();
+                    // Her run icin taze GitHub client: singleton HttpClient'in DNS cache'i
+                    // ve connection pool'u uzun bekleme suresinde bayatliyor.
+                    var gitHubApiService = new GitHubApiService();
+                    var repos = await gitHubApiService.GetAllRepositoriesAsync();
 
                     if (repos.Count == 0)
                     {
