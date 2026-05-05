@@ -113,10 +113,11 @@ namespace GitVault
 
                 using (LogHelpers.MeasureTime("Toplam senkronizasyon", LogCategory.Service, SRC))
                 {
-                    // Her run icin taze GitHub client: singleton HttpClient'in DNS cache'i
-                    // ve connection pool'u uzun bekleme suresinde bayatliyor.
-                    var gitHubApiService = new GitHubApiService();
-                    var repos = await gitHubApiService.GetAllRepositoriesAsync();
+                    List<RepositoryInfo> repos;
+                    using (var gitHubApiService = new GitHubApiService())
+                    {
+                        repos = await gitHubApiService.GetAllRepositoriesAsync();
+                    }
 
                     if (repos.Count == 0)
                     {

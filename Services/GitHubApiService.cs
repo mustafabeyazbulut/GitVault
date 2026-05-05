@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using GitVault.Helpers;
 using GitVault.Models;
@@ -17,13 +18,17 @@ namespace GitVault.Services
         public DateTime LastPush { get; set; }
     }
 
-    public class GitHubApiService
+    public class GitHubApiService : IDisposable
     {
         private const string SRC = "GitHubApi";
+        private static readonly Uri GitHubApiUri = new Uri("https://api.github.com");
         private readonly GitHubClient _client;
 
         public GitHubApiService()
         {
+            // Her işlem başında önceki bağlantıları kapat, taze TCP bağlantısıyla başla.
+            ServicePointManager.FindServicePoint(GitHubApiUri).CloseConnectionGroup(null);
+
             _client = new GitHubClient(new ProductHeaderValue("GitVault"));
 
             if (!string.IsNullOrEmpty(AppSettings.GitHubToken))
@@ -35,6 +40,12 @@ namespace GitVault.Services
             {
                 LogHelpers.Warn("GitHub token belirtilmemis! Public repolar ile sinirli olacak", LogCategory.GitHub, SRC);
             }
+        }
+
+        public void Dispose()
+        {
+            // Her işlem sonunda bağlantıları kapat.
+            ServicePointManager.FindServicePoint(GitHubApiUri).CloseConnectionGroup(null);
         }
 
         public async Task<List<RepositoryInfo>> GetAllRepositoriesAsync()
