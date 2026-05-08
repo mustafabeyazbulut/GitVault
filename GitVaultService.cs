@@ -74,7 +74,7 @@ namespace GitVault
         private async Task ScheduleNextRunTime(CancellationToken ct)
         {
             // Ilk calistirmada hemen basla
-            await RunTaskAsync();
+            await Task.Run(() => RunTaskAsync());
 
             while (!ct.IsCancellationRequested)
             {
@@ -86,7 +86,10 @@ namespace GitVault
 
                 if (!ct.IsCancellationRequested)
                 {
-                    await RunTaskAsync();
+                    // WaitHandle.WaitOne() sonrasi dogrudan await edilen async HTTP istekleri .NET
+                    // Framework 4.8 Windows Service ortaminda basarisiz oluyor; Task.Run ile
+                    // thread pool'dan taze thread kullanilarak sorun giderildi.
+                    await Task.Run(() => RunTaskAsync());
                 }
             }
         }
